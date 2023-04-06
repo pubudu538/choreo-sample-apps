@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -67,5 +68,21 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	if name == "" {
 		name = "Stranger"
 	}
-	fmt.Fprintf(w, "Hello, %s!\n", name)
+
+	endpoint := os.Getenv("EP_VALUE")
+	log.Println("ENv value is " + endpoint)
+	resp, err := http.Get(endpoint)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//We Read the response body on the line below.
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//Convert the body to type string
+	sb := string(body)
+	log.Println(sb)
+
+	fmt.Fprintf(w, "Hello, %s! %s\n", name, sb)
 }
